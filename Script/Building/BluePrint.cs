@@ -13,11 +13,7 @@ public class BluePrint : MonoBehaviour
     void Start()
     {
         myCam = Camera.main;
-        Ray ray = myCam.ScreenPointToRay(Input.mousePosition);
-        if(Physics.Raycast(ray, out hit, Mathf.Infinity, Ground))
-        {
-            transform.position = hit.point;
-        }
+       
     }
 
     // Update is called once per frame
