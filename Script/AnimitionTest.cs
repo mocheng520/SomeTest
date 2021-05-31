@@ -71,7 +71,7 @@ public class AnimitionTest : MonoBehaviour
                     state =3;
             } 
         Debug.Log(myAgent.destination + " "+ transform.position);
-        if(!animation.GetBool("Stand") &&myAgent.remainingDistance < 0.5f   )
+        if(!animation.GetBool("Stand") &&myAgent.remainingDistance < 1f &&!Input.GetMouseButtonDown(1)  )
         {
             //站立
             // myAgent.SetDestination(transform.position);
@@ -142,7 +142,7 @@ public class AnimitionTest : MonoBehaviour
     void GetRandom()
     {  
       n = Random.Range(1,5);
-      if(hasEnemy&& state!= 3)
+      if(hasEnemy&& state!= 3 )
       {
           transform.LookAt(enemyPosition);
       }
