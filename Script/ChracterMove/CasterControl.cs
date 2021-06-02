@@ -30,21 +30,16 @@ public class CasterControl : MonoBehaviour
     public GameObject smallFireEffect;
     public GameObject FirePrefab;
 
-    Vector3 target;
+    Vector3 dir;
     Quaternion lookRotation;
     void Start()
     {
         animation = GetComponent<Animator>();
-        InvokeRepeating("GetRandom",0f,1f);
+
         InvokeRepeating("UpdateEnemy",0f,0.5f);
         // myAgent = GetComponent<UnitMovement>().myAgent
         
         // Debug.Log(animatorStateInfo);
-    }
-
-     void animd()
-    {
-        Debug.Log("wef");
     }
 
 
@@ -52,13 +47,13 @@ public class CasterControl : MonoBehaviour
     void Update()
     {
 
-        if(myAgent.remainingDistance< 0.5f)
+        if(myAgent.remainingDistance< 0.2f)
         {
             animation.SetBool("IsRuning", false);
             // animation.SetBool("IsWalking", false);
         }
 
-        animatorStateInfo = animation.GetCurrentAnimatorStateInfo(0);
+
         if(Input.GetMouseButtonDown(1))
         {
             RaycastHit hit;
@@ -67,14 +62,27 @@ public class CasterControl : MonoBehaviour
             {
                 myAgent.SetDestination(hit.point);
                
-                animation.SetBool("IsRuning", true);
+                
             }
-             
+             animation.SetBool("IsRuning", true);
  
         // StartCoroutine(StandOrNot()); 
         }
        
-         
+                 if(animation.GetBool("IsRuning"))
+        {
+
+            // transform.LookAt(new Vector3(enemyPosition.position.x,transform.position.y,enemyPosition.position.z));
+            dir.x  = myAgent.steeringTarget.x;
+            dir.y = transform.position.y;
+            dir.z = myAgent.steeringTarget.z;
+            dir = dir - transform.position;
+            // Vector3 dir = rotition - transform.position;
+            Quaternion lookRotation = Quaternion.LookRotation(dir);
+            Vector3 rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10).eulerAngles;
+            transform.rotation = Quaternion.Euler(0f, rotation.y, 0f);
+        }
+
 
         //  if(myAgent.velocity.magnitude >=2 ) 
         // {
@@ -95,7 +103,7 @@ public class CasterControl : MonoBehaviour
             fight();
             fireCountdown = 2;
         }
-        else
+        else if (enemyPosition == null)
         {
         animation.SetInteger("Attack",0);
         }
@@ -162,8 +170,11 @@ public class CasterControl : MonoBehaviour
     void fight()
     { 
         if(!animation.GetBool("IsRuning") && Vector3.Distance(transform.forward, (enemyPosition.position-transform.position).normalized) > 0.1f)
+            {
             transform.LookAt(new Vector3(enemyPosition.position.x,transform.position.y,enemyPosition.position.z));
-        animation.SetInteger("Attack",n);
+            }
+        n++;
+        animation.SetInteger("Attack",(n%3)+1);
      
          
 
@@ -296,16 +307,6 @@ public class CasterControl : MonoBehaviour
 
 
 
-    void GetRandom()
-    {  
-      n = Random.Range(1,4);
-      if(hasEnemy)
-      {
-          transform.LookAt(enemyPosition);
-      }
-
-
-    }
     void UpdateEnemy()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag);

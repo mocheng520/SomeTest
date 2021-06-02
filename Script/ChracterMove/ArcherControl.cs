@@ -27,14 +27,14 @@ public class ArcherControl : MonoBehaviour
     public LayerMask ground ;
 
     public GameObject smallFireEffect;
-    public GameObject FirePrefab;
+    public GameObject arrowPrefab;
 
     Vector3 target;
     Quaternion lookRotation;
     void Start()
     {
         animation = GetComponent<Animator>();
-        InvokeRepeating("GetRandom",0f,1f);
+        // InvokeRepeating("GetRandom",0f,1f);
         InvokeRepeating("UpdateEnemy",0f,0.5f);
         // myAgent = GetComponent<UnitMovement>().myAgent
         
@@ -44,13 +44,12 @@ public class ArcherControl : MonoBehaviour
     void Update()
     {
 
-        if(myAgent.remainingDistance< 0.5f)
+        if(myAgent.remainingDistance< 0.2f)
         {
             animation.SetBool("IsRun", false);
             // animation.SetBool("IsWalking", false);
         }
 
-        animatorStateInfo = animation.GetCurrentAnimatorStateInfo(0);
         if(Input.GetMouseButtonDown(1))
         {
             RaycastHit hit;
@@ -89,7 +88,7 @@ public class ArcherControl : MonoBehaviour
         }
         else if (enemyPosition == null)
         {
-        animation.SetBool("IsAttack",false);
+        animation.SetInteger("Attack",0);
         }
 
          fireCountdown -= Time.deltaTime;
@@ -155,25 +154,68 @@ public class ArcherControl : MonoBehaviour
     { 
         if(!animation.GetBool("IsRun") && Vector3.Distance(transform.forward, (enemyPosition.position-transform.position).normalized) > 0.1f)
             transform.LookAt(new Vector3(enemyPosition.position.x,transform.position.y,enemyPosition.position.z));
-        animation.SetBool("IsAttack",true);
-
-       StartCoroutine(fire());  
-       
-         
+        ChooseAnimation();
+        animation.SetInteger("Attack",n);
 
     }
-     IEnumerator fire()
-     {
-         
-         yield return new WaitForSeconds(0.7f);
-        //  yield return new WaitForSeconds(3f);
-          Debug.Log("1223");
-        GameObject arrowGo = (GameObject)Instantiate(FirePrefab,FirePosition.position,transform.rotation);
+    void ChooseAnimation()
+    {
+        Vector2 my2DPosition = new Vector2(transform.position.x, transform.position.z);
+        Vector2 enemy2DPosition = new Vector2(enemyPosition.position.x, enemyPosition.position.z);
+        n=1;
+        if(Vector2.Distance(my2DPosition, enemy2DPosition) < 3f)
+        {
+            if(transform.position.y > enemyPosition.position.y+2)
+                n =3;
+            else if (transform.position.y+2 < enemyPosition.position.y)
+            n =2;
+        }
+       
+    }
+
+    void ShotStright()
+    {
+         GameObject arrowGo = (GameObject)Instantiate(arrowPrefab,FirePosition.position,transform.rotation);
         Arrow  arrow = arrowGo.GetComponent<Arrow>();
         if(arrow != null)
             {
                 arrow.Seek(enemyPosition);
             }
+    }
+
+    void ShotTop()
+    {
+         GameObject arrowGo = (GameObject)Instantiate(arrowPrefab,FirePosition.position,transform.rotation);
+        Arrow  arrow = arrowGo.GetComponent<Arrow>();
+        if(arrow != null)
+            {
+                arrow.Seek(enemyPosition);
+            }
+    }
+
+    void ShotDown()
+    {
+         GameObject arrowGo = (GameObject)Instantiate(arrowPrefab,FirePosition.position,transform.rotation);
+        Arrow  arrow = arrowGo.GetComponent<Arrow>();
+        if(arrow != null)
+            {
+                arrow.Seek(enemyPosition);
+            }
+    }
+
+
+    //  IEnumerator fire()
+    //  {
+         
+    //      yield return new WaitForSeconds(0.7f);
+    //     //  yield return new WaitForSeconds(3f);
+    //       Debug.Log("1223");
+    //     GameObject arrowGo = (GameObject)Instantiate(FirePrefab,FirePosition.position,transform.rotation);
+    //     Arrow  arrow = arrowGo.GetComponent<Arrow>();
+    //     if(arrow != null)
+    //         {
+    //             arrow.Seek(enemyPosition);
+    //         }
 
         //  if(n == 1)
         //  {
@@ -204,7 +246,7 @@ public class ArcherControl : MonoBehaviour
 
 
         
-         } 
+        //  } 
 
     //       IEnumerator SecondFire()
     //  {
@@ -260,16 +302,11 @@ public class ArcherControl : MonoBehaviour
 
 
 
-    void GetRandom()
-    {  
-      n = Random.Range(1,4);
-      if(hasEnemy)
-      {
-          transform.LookAt(enemyPosition);
-      }
-
-
-    }
+    // void GetRandom()
+    // {  
+    //   n = Random.Range(1,4);
+    
+    // }
     void UpdateEnemy()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag);
