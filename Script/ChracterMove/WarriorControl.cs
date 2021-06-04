@@ -2,30 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+[RequireComponent(typeof(UnitMovement))]
 public class WarriorControl : MonoBehaviour
 {
     Animator animation;
     AnimatorStateInfo animatorStateInfo;
     //n是随机数，用于随机动作
     int n;
-    //state表示角色当前的状态
-    // 1: 站立
-    // 2: 等待战斗
-    // 3：跑步
-    // 4. 打架
-
-    int state = 1;
+    UnitMovement movement;
+    [Header("Attribute")]
+    public float range = 2f;
+    public float damage = 10f;
+    public float fireCountdown;
+    [Header("Effect")]
     public GameObject effect;
     public Transform effectPosition;
-    bool StartEffect = false;
-    bool hasEnemy = false;
-    float fireCountdown;
-
-    public Transform enemyPosition;
-    public float range = 2f;
-    public string enemyTag = "enemy";
-    public UnityEngine.AI.NavMeshAgent  myAgent;
+    [Header("Others")]
+    public Transform autoEnemy;
+    public Transform enemy;
     public LayerMask ground ;
+    public string enemyTag = "enemy";
+    
+
+    
+    
+    
+     UnityEngine.AI.NavMeshAgent  myAgent;
+    
 
     Vector3 dir;
     Quaternion lookRotation;
@@ -34,7 +38,8 @@ public class WarriorControl : MonoBehaviour
         animation = GetComponent<Animator>();
         // InvokeRepeating("GetRandom",0f,1f);
         InvokeRepeating("UpdateEnemy",0f,0.5f);
-        // myAgent = GetComponent<UnitMovement>().myAgent
+        myAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        movement = GetComponent<UnitMovement>();
         
         // Debug.Log(animatorStateInfo);
     }
@@ -42,54 +47,87 @@ public class WarriorControl : MonoBehaviour
     void Update()
     {
 
-        if(myAgent.remainingDistance< 0.5f)
-        {
-            animation.SetBool("IsRuning", false);
-        }
+        
 
         // animatorStateInfo = animation.GetCurrentAnimatorStateInfo(0);
-        if(Input.GetMouseButtonDown(1))
-        {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if(Physics.Raycast(ray, out hit , Mathf.Infinity, ground))
-            {
-                myAgent.SetDestination(hit.point);
+        // if(Input.GetMouseButtonDown(1))
+        // {
+        //     RaycastHit hit;
+        //     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //     if(Physics.Raycast(ray, out hit , Mathf.Infinity, ground))
+        //     {
+        //         myAgent.SetDestination(hit.point);
                
                 
-            }
-             animation.SetBool("IsRuning", true);
+        //     }
+        //      animation.SetBool("IsRuning", true);
 
-        }
+        // }
        
            //移动转向
         if(animation.GetBool("IsRuning"))
         {
 
             // transform.LookAt(new Vector3(enemyPosition.position.x,transform.position.y,enemyPosition.position.z));
-            dir.x  = myAgent.steeringTarget.x;
-            dir.y = transform.position.y;
-            dir.z = myAgent.steeringTarget.z;
-            dir = dir - transform.position;
-            // Vector3 dir = rotition - transform.position;
-            Quaternion lookRotation = Quaternion.LookRotation(dir);
-            Vector3 rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10).eulerAngles;
-            transform.rotation = Quaternion.Euler(0f, rotation.y, 0f);
+            SmoothFaceToTarget(myAgent.steeringTarget);
+            // dir.x  = myAgent.steeringTarget.x;
+            // dir.y = transform.position.y;
+            // dir.z = myAgent.steeringTarget.z;
+            // dir = dir - transform.position;
+            // // Vector3 dir = rotition - transform.position;
+            // Quaternion lookRotation = Quaternion.LookRotation(dir);
+            // Vector3 rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10).eulerAngles;
+            // transform.rotation = Quaternion.Euler(0f, rotation.y, 0f);
         }
 
-
-        if(enemyPosition != null  && fireCountdown <= 0f)
+        //加入在战斗，使角色始终面对怪物
+        if(!animation.GetBool("IsRuning") && animation.GetInteger("Attack") > 0 && enemy != null)
         {
-            fight();
-             fireCountdown = 1;
+            SmoothFaceToTarget(enemy.position);
         }
-        else if (enemyPosition == null)
+        
+        if(fireCountdown <= 0f)
         {
-         animation.SetInteger("Attack",0);
+            Debug.Log(movement.focus);
+            if(movement.focus != null)
+            {
+                Fight(movement.focus);
+                fireCountdown = 1;
+            }
+            else if(autoEnemy != null)
+            {
+                Fight(autoEnemy);
+                fireCountdown = 1;
+            }
+            else 
+                animation.SetInteger("Attack", 0);
         }
         fireCountdown -= Time.deltaTime;
+        // if(movement.focus != null)
+        // {
+        //     FightFocus(movement.focus);
+        // }
+        // else if(movement.focus==null&&enemyPosition != null  && fireCountdown <= 0f)
+        // {
+        //      Autofight(enemyPosition);
+        //      fireCountdown = 1;
+        // }
+        // else if (enemyPosition == null)
+        // {
+        //  animation.SetInteger("Attack",0);
+        // }
+        // fireCountdown -= Time.deltaTime;
 
     }
+
+    // void FightFocus(Transform enemy)
+    // {
+    //     enemy.GetComponent<Health>().TakeDamage(damage);
+    // }
+    // public void StartRun()
+    // {
+    //     animation.SetBool("IsRuning", true);
+    // }
 
 
        
@@ -146,43 +184,38 @@ public class WarriorControl : MonoBehaviour
 //         // }
 
 //     }
+    void SmoothFaceToTarget(Vector3 target)
+    {
+            dir.x  = target.x;
+            dir.y = transform.position.y;
+            dir.z = target.z;
+            dir = dir - transform.position;
+            // Vector3 dir = rotition - transform.position;
+            Quaternion lookRotation = Quaternion.LookRotation(dir);
+            Vector3 rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10).eulerAngles;
+            transform.rotation = Quaternion.Euler(0f, rotation.y, 0f);
+    }
 
-    void fight()
+
+    void Fight(Transform _enemy)
     { 
-         if(!animation.GetBool("IsRuning") && Vector3.Distance(transform.forward, (enemyPosition.position-transform.position).normalized) > 0.1f)
-            transform.LookAt(new Vector3(enemyPosition.position.x,transform.position.y,enemyPosition.position.z));
+        enemy = _enemy;
+        // if(!animation.GetBool("IsRuning") && Vector3.Distance(transform.forward, (enemy.position-transform.position).normalized) > 0.1f)
+        //     transform.LookAt(new Vector3(enemy.position.x,transform.position.y,enemy.position.z));
             n++;
         animation.SetInteger("Attack",(n%3)+1);
        
-       
 
-        // if(animatorStateInfo.IsName("Attack3")|| animatorStateInfo.IsName("Attack2"))
-        // {
-        //     if(animatorStateInfo.normalizedTime >= 0.41f && animatorStateInfo.normalizedTime <= 0.43f)
-        //     {GameObject effect1= (GameObject) Instantiate(effect, effectPosition.position,transform.rotation);
-        //     Destroy(effect1, 0.5f);
-        //     }
-        // }
-        // // else if (animatorStateInfo.IsName("Attack03"))
-        // // {
-        // //     if(animatorStateInfo.normalizedTime >= 0.21f && animatorStateInfo.normalizedTime <= 0.23f)
-        // //     {GameObject effect1= (GameObject) Instantiate(effect, effectPosition.position,transform.rotation);
-        // //     Destroy(effect1, 0.5f);
-        // //     }
-        // // }
-        // else if(animatorStateInfo.normalizedTime >= 0.33f && animatorStateInfo.normalizedTime <= 0.35f)
-        // {
-        //     GameObject effect1= (GameObject) Instantiate(effect, effectPosition.position,transform.rotation);
-        // Destroy(effect1, 0.5f);
-        // }
-       
         
     }
 
     void ChopEffect()
     {
+        //把伤害传递写在特效这里
+        if(enemy != null)
+            enemy.GetComponent<Health>().TakeDamage(damage);
         GameObject effect1= (GameObject) Instantiate(effect, effectPosition.position,transform.rotation);
-            Destroy(effect1, 0.5f);
+        Destroy(effect1, 0.5f);
     }
 
 
@@ -216,11 +249,11 @@ public class WarriorControl : MonoBehaviour
             }
         }
         if(shortestDistance > range)
-        enemyPosition = null;
+        autoEnemy = null;
 
         if(nearestEnemy != null && shortestDistance <= range)
         {
-            enemyPosition = nearestEnemy.transform;
+            autoEnemy = nearestEnemy.transform;
         }
 
     }

@@ -29,7 +29,7 @@ public class ArcherControl : MonoBehaviour
     public GameObject smallFireEffect;
     public GameObject arrowPrefab;
 
-    Vector3 target;
+    Vector3 dir;
     Quaternion lookRotation;
     void Start()
     {
@@ -63,6 +63,19 @@ public class ArcherControl : MonoBehaviour
              
  
         // StartCoroutine(StandOrNot()); 
+        }
+        if(animation.GetBool("IsRun"))
+        {
+
+            // transform.LookAt(new Vector3(enemyPosition.position.x,transform.position.y,enemyPosition.position.z));
+            dir.x  = myAgent.steeringTarget.x;
+            dir.y = transform.position.y;
+            dir.z = myAgent.steeringTarget.z;
+            dir = dir - transform.position;
+            // Vector3 dir = rotition - transform.position;
+            Quaternion lookRotation = Quaternion.LookRotation(dir);
+            Vector3 rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10).eulerAngles;
+            transform.rotation = Quaternion.Euler(0f, rotation.y, 0f);
         }
        
          

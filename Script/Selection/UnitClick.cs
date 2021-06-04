@@ -9,19 +9,23 @@ public class UnitClick : MonoBehaviour
     public LayerMask clickable;
     public LayerMask ground;
     public GameObject groundMarker;
-    
+
 
 
     void Start()
     {
         myCam = Camera.main;
+
     }
 
     // Update is called once per frame
     void Update()
     {
+
+       
         if(Input.GetMouseButtonDown(0))
         {
+            
             RaycastHit hit;
             Ray ray = myCam.ScreenPointToRay(Input.mousePosition);
 
@@ -34,6 +38,7 @@ public class UnitClick : MonoBehaviour
                 else
                 {
                     UnitSelections.Instance.ClickSelect(hit.collider.gameObject);
+                    
                 }
 
             }
@@ -56,6 +61,7 @@ public class UnitClick : MonoBehaviour
 
             if(Physics.Raycast(ray, out hit, Mathf.Infinity, ground))
             {
+
                 groundMarker.transform.position = hit.point;
                 groundMarker.SetActive(false);
                 groundMarker.SetActive(true);

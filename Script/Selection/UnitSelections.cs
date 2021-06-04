@@ -23,6 +23,7 @@ public class UnitSelections : MonoBehaviour
      }
 
 
+
      public void ClickSelect(GameObject unitToAdd)
      {
          DeSelectAll();
@@ -43,7 +44,7 @@ public class UnitSelections : MonoBehaviour
          {
              unitsSelected.Remove(unitToAdd);            
              unitToAdd.transform.GetChild(0).gameObject.SetActive(false);
-            unitToAdd.GetComponent<UnitMovement>().enabled = false;
+            // unitToAdd.GetComponent<UnitMovement>().enabled = false;
          }
          
      }

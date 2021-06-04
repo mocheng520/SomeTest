@@ -27,7 +27,6 @@ public class CameraMove : MonoBehaviour
         float hsp = transform.position.y * speed * Input.GetAxis("Horizontal");
         float vsp = transform.position.y * speed * Input.GetAxis("Vertical");
         float scrollSp = Mathf.Log(transform.position.y) * - zoomSpeed * Input.GetAxis("Mouse ScrollWheel");
-
         Vector3 VerticalMove = new Vector3(0, scrollSp, 0);
         Vector3 lateralMove = hsp * transform.right;
         Vector3 forwardMove = transform.forward;
@@ -35,8 +34,9 @@ public class CameraMove : MonoBehaviour
         forwardMove.y = 0;
         forwardMove.Normalize();
         forwardMove *= vsp;
-
+       
         Vector3 move = VerticalMove + lateralMove + forwardMove;
+        
         transform.position += move;
 
         getCameraRotation();
