@@ -63,7 +63,7 @@ public class WarriorControl : MonoBehaviour
         //      animation.SetBool("IsRuning", true);
 
         // }
-       
+        if(animation.GetBool("IsDead")) return ;
            //移动转向
         if(animation.GetBool("IsRuning"))
         {
@@ -88,7 +88,7 @@ public class WarriorControl : MonoBehaviour
         
         if(fireCountdown <= 0f)
         {
-            Debug.Log(movement.focus);
+            // Debug.Log(movement.focus);
             if(movement.focus != null)
             {
                 Fight(movement.focus);

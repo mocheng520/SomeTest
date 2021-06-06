@@ -18,7 +18,7 @@ public class GoblinControl : MonoBehaviour
     {
                 animation = GetComponent<Animator>();
         myAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        InvokeRepeating("UpdateEnemy",0f,0.5f);
+        InvokeRepeating("UpdateHero",0f,0.5f);
     }
 
     // Update is called once per frame
@@ -28,7 +28,7 @@ public class GoblinControl : MonoBehaviour
         {
             animation.SetBool("IsRuning", false);
         }
-
+        if(Hero == null) return ;
         if(Vector3.Distance(Hero.transform.position, transform.position) > LongAttackRange )
         {
             Move();
@@ -84,7 +84,7 @@ public class GoblinControl : MonoBehaviour
 
 
 
-       void UpdateEnemy()
+       void UpdateHero()
     {
         GameObject[] heros = GameObject.FindGameObjectsWithTag(heroTag);
 
@@ -101,8 +101,8 @@ public class GoblinControl : MonoBehaviour
                 nearestHero = hero;
             }
         }
-        // if(shortestDistance > range)
-        // enemyPosition = null;
+        if(shortestDistance > LongAttackRange)
+            nearestHero = null;
 
         if(nearestHero != null )
         {

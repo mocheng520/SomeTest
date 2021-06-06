@@ -5,8 +5,11 @@ using UnityEngine;
 public class FireStick : MonoBehaviour
 {
     private Transform target;
+    [Header("Attribute")]
     public float speed = 10f;
+    public float damage = 10f;
 
+    [Header("Effect")]
     public Transform FirePart;
     public GameObject FireBallEffect;
     public GameObject ExploreEffect;
@@ -46,7 +49,7 @@ public class FireStick : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(target == null) return;
         Vector3 dir = target.position - transform.position;
         float distanceThisFrame = speed * Time.deltaTime;
         transform.Rotate(Vector3.right * Time.deltaTime* 1000f);
@@ -63,6 +66,8 @@ public class FireStick : MonoBehaviour
     }
      void HitTarget()
     {
+         
+        target.parent.GetComponent<Health>().TakeDamage(damage);
         GameObject exploreEffect= (GameObject) Instantiate(ExploreEffect, transform.position,transform.rotation);
         Destroy(exploreEffect, 2f);
         // Destroy(fireBallEffect, 2f);

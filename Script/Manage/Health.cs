@@ -39,6 +39,6 @@ public class Health : MonoBehaviour
         GetComponent<Animator>().SetBool("IsDead", true);
         GameObject dieEffectGO = (GameObject)Instantiate(DieEffect,transform.position,transform.rotation);
         Destroy(dieEffectGO, 2f);
-        Destroy(gameObject, 2f);
+        Destroy(gameObject, 3f);
     }
 }
