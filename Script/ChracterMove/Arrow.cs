@@ -48,7 +48,12 @@ public class Arrow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(target == null )
+        {
+            Destroy(gameObject);
+            Destroy(arrowEffect);
+            return;
+        } 
         Vector3 dir = target.position - transform.position;
         float distanceThisFrame = speed * Time.deltaTime;
 
@@ -64,6 +69,7 @@ public class Arrow : MonoBehaviour
     }
      void HitTarget()
     {
+        Debug.Log("hit");
         GameObject exploreEffect= (GameObject) Instantiate(ExploreEffect, transform.position,transform.rotation);
         Destroy(exploreEffect, 2f);
         Destroy(arrowEffect, 0.1f);

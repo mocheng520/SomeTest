@@ -6,8 +6,8 @@ public class Unit : MonoBehaviour
 {
 
     //findRand表示可以自动攻击 跟随的范围
-    // public float findRange = 2f;
-    // public Transform autoEnemy;
+    public float findRange;
+    public Transform autoEnemy;
     //sd
     Animator animation;
     UnityEngine.AI.NavMeshAgent  myAgent;
@@ -18,7 +18,7 @@ public class Unit : MonoBehaviour
         UnitSelections.Instance.unitList.Add(this.gameObject);
         animation = GetComponent<Animator>();
         myAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        // InvokeRepeating("UpdateEnemy",0f,0.5f);
+        InvokeRepeating("UpdateEnemy",0f,0.5f);
     }
 
     private void OnDestroy()
@@ -50,30 +50,30 @@ public class Unit : MonoBehaviour
     }
 
 
-    //  void UpdateEnemy()
-    // {
-    //     GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag);
+     void UpdateEnemy()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag);
 
 
-    //     float shortestDistance = Mathf.Infinity;
-    //     GameObject nearestEnemy = null;
+        float shortestDistance = Mathf.Infinity;
+        GameObject nearestEnemy = null;
 
-    //     foreach (GameObject enemy in enemies)
-    //     {
-    //         float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
-    //         if (distanceToEnemy < shortestDistance)
-    //         {
-    //             shortestDistance = distanceToEnemy;
-    //             nearestEnemy = enemy;
-    //         }
-    //     }
-    //     if(shortestDistance > findRange)
-    //     autoEnemy = null;
+        foreach (GameObject enemy in enemies)
+        {
+            float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
+            if (distanceToEnemy < shortestDistance)
+            {
+                shortestDistance = distanceToEnemy;
+                nearestEnemy = enemy;
+            }
+        }
+        if(shortestDistance > findRange)
+        autoEnemy = null;
 
-    //     if(nearestEnemy != null && shortestDistance <= findRange)
-    //     {
-    //         autoEnemy = nearestEnemy.transform;
-    //     }
+        if(nearestEnemy != null && shortestDistance <= findRange)
+        {
+            autoEnemy = nearestEnemy.transform;
+        }
 
-    // }
+    }
 }

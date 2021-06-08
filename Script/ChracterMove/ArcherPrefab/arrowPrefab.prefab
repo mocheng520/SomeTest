@@ -108,10 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 637d127f465c6c64a9f7c004b63b2045, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 22
-  ShootFromEffect: {fileID: 2133735349413398378, guid: 96f62fd035c1f4a44966f758103b9815,
-    type: 3}
-  ArrowEffect: {fileID: 7458143643399451316, guid: 112d8a6eab18ce344add92544f084e5f,
-    type: 3}
-  ExploreEffect: {fileID: 3904753688682019010, guid: a6b31a11f7543f04c86c5a2dd1a374f8,
-    type: 3}
+  speed: 2
+  ShootFromEffect: {fileID: 2133735349413398378, guid: 96f62fd035c1f4a44966f758103b9815, type: 3}
+  ArrowEffect: {fileID: 7458143643399451316, guid: 112d8a6eab18ce344add92544f084e5f, type: 3}
+  ExploreEffect: {fileID: 3904753688682019010, guid: a6b31a11f7543f04c86c5a2dd1a374f8, type: 3}
